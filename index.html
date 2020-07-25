@@ -132,7 +132,8 @@ const data = await d3.csv('https://flunky.github.io/cars2017.csv');
 		.style("opacity", 0.6)
 		.on("mouseover", function(d,i){return tooltip
 												.style("visibility", "visible")
-												.text(d.Make+", "+d.Fuel+", "+d.EngineCylinders+" Cylinders");})		
+												.attr("data-html", "true")
+												.text(d.Make+", "+d.Fuel+", "+d.EngineCylinders+" Cylinders.  Highway MPG:"+ d.AverageHighwayMPG+",  City MPG:"+d.AverageCityMPG);})		
 		.on("mousemove", function(){return tooltip.style("top",
 			(d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
 		.on("mouseout", function(){return tooltip.style("visibility", "hidden");});
