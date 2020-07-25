@@ -4,21 +4,18 @@
 
 
 <style>
-.chart rect { fill: steelblue; }
-#tooltip {
-    opacity: 0;
-    position: absolute;
-    text-align: center;
-    width: 100px; height: 80px;
-    background: white;
-    border: 0px;
-}
+    .annotation-note-title, text.title {
+      font-weight: bold;
+    }
+
+    text.title {
+      font-size: 1.2em;
+    }
 </style>
 
 <body onload='init()'>
-<svg width=700 height=700></svg>
+<svg width=700 height=700 id="chart"></svg>
 <div id="tooltip"></div>
-
 
 
 <script>
@@ -27,20 +24,13 @@ var color = d3.scaleOrdinal()
 	.domain([0, 2, 3, 4, 6, 8, 10, 12])
 	.range([ "green", "yellow", "yellow", "yellow", "gold", "orange", "red", "red"])
 
-var dataAll = ["0", "2", "3", "4", "6", "8", "10", "12"];
-var data12 = ["10","12"];
-var data8 = ["8"];
-var data6 = ["6"];
-var data4 = ["2","3","4"];
-var data0 = ["0"];
-
 
 var margin = 50;
 var height = 600;
 var width = 600;
 
-var x = d3.scaleLog().domain([10,150]).range([0,width]);
-var y = d3.scaleLog().domain([10,150]).range([height,0]);
+var x = d3.scaleLog().domain([10,160]).range([0,width]);
+var y = d3.scaleLog().domain([10,160]).range([height,0]);
 
 //var tooltip = d3.select("#tooltip");
 var tooltip = d3.select("body")
@@ -60,15 +50,13 @@ var tooltip = d3.select("body")
 async function init() {
 const data = await d3.csv('https://flunky.github.io/cars2017.csv');
 
-
-
 d3.select("svg").append("g")
 .attr("transform","translate("+margin+","+margin+")")
-.call(d3.axisLeft(y).tickValues([10,20,50,100]).tickFormat(d3.format("~s")));
+.call(d3.axisLeft(y).tickValues([10,20,40,80,160]).tickFormat(d3.format("~s")));
 
 d3.select("svg").append("g")
 .attr("transform","translate("+margin+","+(width+margin)+")")
-.call(d3.axisBottom(x).tickValues([10,20,50,100]).tickFormat(d3.format("~s")));
+.call(d3.axisBottom(x).tickValues([10,20,40,80,160]).tickFormat(d3.format("~s")));
 
 d3.select('svg')
 .append("g")
@@ -83,14 +71,7 @@ d3.select('svg')
     .attr('r',function(d,i) {return (parseInt(d.EngineCylinders,10)+2)*3;})
 	.style("fill", function(d,i) {return color(parseInt(d.EngineCylinders,10));})
 	.style("stroke", "grey")
-	.style("opacity", 0.2)
-	.on("mouseover", function(d,i){return tooltip
-											.style("visibility", "visible")
-											.text(d.Make+", "+d.Fuel+", "+d.EngineCylinders+" Cylinders");})		
-	.on("mousemove", function(){return tooltip.style("top",
-		(d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
-	.on("mouseout", function(){return tooltip.style("visibility", "hidden");});
-
+	.style("opacity", 0.0)
 
 
 }
@@ -98,33 +79,31 @@ d3.select('svg')
 async function update(cylinders) {
 const data = await d3.csv('https://flunky.github.io/cars2017.csv');
 
-//	var selectedData = data.filter(function(d){return d.EngineCylinders==cylinders});
-	document.getElementById("demo").innerHTML = cylinders;
-//	document.getElementById("demo").innerHTML = data;
+//	document.getElementById("demo").innerHTML = cylinders;
 	d3.select('svg').selectAll('*').remove();
 
 	d3.select("svg").append("g")
 	.attr("transform","translate("+margin+","+margin+")")
-	.call(d3.axisLeft(y).tickValues([10,20,50,100]).tickFormat(d3.format("~s")));
+	.call(d3.axisLeft(y).tickValues([10,20,40,80,160]).tickFormat(d3.format("~s")));
 
 	d3.select("svg").append("g")
 	.attr("transform","translate("+margin+","+(width+margin)+")")
-	.call(d3.axisBottom(x).tickValues([10,20,50,100]).tickFormat(d3.format("~s")));
+	.call(d3.axisBottom(x).tickValues([10,20,40,80,160]).tickFormat(d3.format("~s")));
 
 	d3.select('svg')
 	.append("g")
 	.attr("transform","translate("+margin+","+margin+")")
 	  .selectAll('circle')
-	  .data(data.filter(function(d){return d.EngineCylinders == cylinders;}))
+	  .data(data.filter(function(d){return parseInt(d.EngineCylinders,10) >= cylinders;}))
 	  .enter()
 	  .append('circle')
 		.attr('cx',function(d,i) {return x(d.AverageCityMPG);})
 		.attr('cy',function(d,i) {return y(d.AverageHighwayMPG);})
 	//	.transition().duration(500).delay(100)
-		.attr('r',function(d,i) {return (parseInt(d.EngineCylinders,10)+2)*3;})
+		.attr('r',4)
 		.style("fill", function(d,i) {return color(parseInt(d.EngineCylinders,10));})
-		.style("stroke", "black")
-		.style("opacity", 1)
+		.style("stroke", "grey")
+		.style("opacity", 0.6)
 		.on("mouseover", function(d,i){return tooltip
 												.style("visibility", "visible")
 												.text(d.Make+", "+d.Fuel+", "+d.EngineCylinders+" Cylinders");})		
@@ -132,19 +111,73 @@ const data = await d3.csv('https://flunky.github.io/cars2017.csv');
 			(d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
 		.on("mouseout", function(){return tooltip.style("visibility", "hidden");});
 
+	// annotations
 
+	var	aText = "Watch the relationship between cylinders and MPG";
+	var	aX = 100;
+	var	aY = 100;	
+	switch(cylinders) {
+	  case 12:
+		aText = "12 cylinder cars can barely get more than 10 MPG in the city";
+		aX = 100 + cylinders*3;
+		aY = 50 + cylinders*40;
+		break;
+	  case 10:
+		aText = "10 cylinder cars can barely get more than 15 MPG in the city";
+		aX = 100 + cylinders*3;
+		aY = 50 + cylinders*40;
+		break;
+	  case 8:
+		aText = "8 cylinder cars is a bit better, but sill under 20 MPG in the city";
+		aX = 100 + cylinders*3;
+		aY = 50 + cylinders*40;
+		break;
+	  case 6:
+		aText = "6 cylinder vehicles can exceed 20 city MPG";
+		aX = 100 + cylinders*3;
+		aY = 50 + cylinders*40;
+		break;
+	  case 4:
+		aText = "4 cylinder vehicles can get to 30 MPG in the city.  Better!";
+		aX = 100 + cylinders*3;
+		aY = 50 + cylinders*40;
+		break;
+	  case 2:
+		aText = "2 cylinder vehicles can can barely get to 40 MPG in the city.  Is that the limit?";
+		aX = 100 + cylinders*3;
+		aY = 50 + cylinders*40;
+		break;
+	  case 0:
+		aText = "Look at the huge leap in efficiency of electric cars!  Almost 3x gasoline!";
+		aX = 100 + cylinders*3;
+		aY = 50 + cylinders*40;
+		break;
+	  default:
+
+	}
+	  
+	d3.select("svg")
+	  .append("g")
+	  .attr("transform","translate("+margin+","+margin+")")
+	  .append('text')
+	  .attr("x", aX)
+	  .attr("y", aY)
+	  .attr("dy", ".35em")
+	  .text(aText);
+  
 }
 </script>
-<p>Click on the buttons to see the miles per gallon changes as the number of cylinders decrease:</p>
+<p>Click on the buttons below to see the how cars' city and highway miles per gallon changes as the number of cylinders decrease:</p>
 
 <p> 
-Cylinders:
-<button onclick="update(dataAll)">All Cars</button>
-<button onclick="update(data12)">10-12 Cylinders</button>
-<button onclick="update(data8)">8 Cylinders</button>
-<button onclick="update(data6)">6 Cylinders</button>
-<button onclick="update(data4)">1-4 Cylinders</button>
-<button onclick="update(data0)">Electric</button>
+Cars with at least:
+<button onclick="update(12)">12 Cylinders</button>
+<button onclick="update(10)">10 Cylinders</button>
+<button onclick="update(8)">8 Cylinders</button>
+<button onclick="update(6)">6 Cylinders</button>
+<button onclick="update(4)">4 Cylinders</button>
+<button onclick="update(2)">2 Cylinders</button>
+<button onclick="update(0)">0 (Electric)</button>
 </p>
 <p id="demo"></p>
 </body>
