@@ -13,6 +13,16 @@
     }
 </style>
 
+<head>
+<h1>Vehicle Mileage per Gallon of Gasoline Equivalent, Based on Engine Cylinder Count</h1>
+<p>In the chart below, observe how the mileage of various vehicles change as the engine cylinder count changes.</p>
+<p>
+Click on the buttons below to see the how cars' city and highway miles per gallon changes as the number of cylinders decrease.
+<br>
+You can mouse over each dot in the plot to see more details about the vehicle it represents.
+</p>
+</head>
+
 <body onload='init()'>
 <svg width=700 height=700 id="chart"></svg>
 <div id="tooltip"></div>
@@ -82,13 +92,29 @@ const data = await d3.csv('https://flunky.github.io/cars2017.csv');
 //	document.getElementById("demo").innerHTML = cylinders;
 	d3.select('svg').selectAll('*').remove();
 
+	// y axis
 	d3.select("svg").append("g")
 	.attr("transform","translate("+margin+","+margin+")")
 	.call(d3.axisLeft(y).tickValues([10,20,40,80,160]).tickFormat(d3.format("~s")));
-
+	
+	// y label
 	d3.select("svg").append("g")
-	.attr("transform","translate("+margin+","+(width+margin)+")")
+	.append("text")
+	.attr("transform","translate("+(margin-30)+","+(margin+height/2)+")"+"rotate(-90)")
+	.style("text-anchor", "middle")
+	.text("Highway Miles per Gallon")
+
+	// x axis
+	d3.select("svg").append("g")
+	.attr("transform","translate("+margin+","+(height+margin)+")")
 	.call(d3.axisBottom(x).tickValues([10,20,40,80,160]).tickFormat(d3.format("~s")));
+
+	// x label
+	d3.select("svg").append("g")
+	.append("text")
+	.attr("transform","translate("+(margin+width/2)+","+(height+margin+40)+")")
+	.style("text-anchor", "middle")
+	.text("City Miles per Gallon")
 
 	d3.select('svg')
 	.append("g")
@@ -119,41 +145,40 @@ const data = await d3.csv('https://flunky.github.io/cars2017.csv');
 	switch(cylinders) {
 	  case 12:
 		aText = "12 cylinder cars can barely get more than 10 MPG in the city";
-		aX = 100 + cylinders*3;
+		aX = 200;
 		aY = 50 + cylinders*40;
 		break;
 	  case 10:
 		aText = "10 cylinder cars can barely get more than 15 MPG in the city";
-		aX = 100 + cylinders*3;
+		aX = 200;
 		aY = 50 + cylinders*40;
 		break;
 	  case 8:
 		aText = "8 cylinder cars is a bit better, but sill under 20 MPG in the city";
-		aX = 100 + cylinders*3;
+		aX = 200;
 		aY = 50 + cylinders*40;
 		break;
 	  case 6:
 		aText = "6 cylinder vehicles can exceed 20 city MPG";
-		aX = 100 + cylinders*3;
+		aX = 200;
 		aY = 50 + cylinders*40;
 		break;
 	  case 4:
 		aText = "4 cylinder vehicles can get to 30 MPG in the city.  Better!";
-		aX = 100 + cylinders*3;
+		aX = 50;
 		aY = 50 + cylinders*40;
 		break;
 	  case 2:
 		aText = "2 cylinder vehicles can can barely get to 40 MPG in the city.  Is that the limit?";
-		aX = 100 + cylinders*3;
+		aX = 50;
 		aY = 50 + cylinders*40;
 		break;
 	  case 0:
 		aText = "Look at the huge leap in efficiency of electric cars!  Almost 3x gasoline!";
-		aX = 100 + cylinders*3;
+		aX = 50;
 		aY = 50 + cylinders*40;
 		break;
 	  default:
-
 	}
 	  
 	d3.select("svg")
@@ -163,6 +188,11 @@ const data = await d3.csv('https://flunky.github.io/cars2017.csv');
 	  .attr("x", aX)
 	  .attr("y", aY)
 	  .attr("dy", ".35em")
+	  .style("font-size", "18px")
+	  .style("fill", function(d,i) {return color(cylinders);})
+	  .style("stroke", "grey")
+	  .style("stroke-width", "2px")
+	  .style("paint-order", "stroke")
 	  .text(aText);
   
 }
