@@ -17,7 +17,7 @@
 <h1>Vehicle Mileage per Gallon of Gasoline Equivalent, Based on Engine Cylinder Count</h1>
 <p>In the chart below, observe how the mileage of various vehicles change as the engine cylinder count changes.</p>
 <p>
-Click on the buttons below to see the how cars' city and highway miles per gallon changes as the number of cylinders decrease.
+Click on the buttons at the bottom of the page to see the how cars' city and highway miles per gallon changes as the number of cylinders decrease.
 <br>
 You can mouse over each dot in the plot to see more details about the vehicle it represents.
 </p>
@@ -81,8 +81,44 @@ d3.select('svg')
     .attr('r',function(d,i) {return (parseInt(d.EngineCylinders,10)+2)*3;})
 	.style("fill", function(d,i) {return color(parseInt(d.EngineCylinders,10));})
 	.style("stroke", "grey")
-	.style("opacity", 0.0)
+	.style("opacity", 0.0);
 
+// draw arrow
+//Draw the line
+d3.select('svg')
+.append("g")
+ .attr("transform","translate("+(margin+width/2+90)+","+(margin+height+30)+")")
+ .append("line")
+ .attr("x1", 2)
+ .attr("y1", 2)
+ .attr("x2", -50)
+ .attr("y2", -50)
+ .attr("stroke-width", 10)
+ .attr("stroke", "blue");
+
+d3.select('svg')
+.append("g")
+ .attr("transform","translate("+(margin+width/2+90)+","+(margin+height+30)+")")
+ .append("line")
+ .attr("x1", -2)
+ .attr("y1", -2)
+ .attr("x2", 50)
+ .attr("y2", -50)
+ .attr("stroke-width", 10)
+ .attr("stroke", "blue");
+
+// initial text
+d3.select("svg")
+  .append("g")
+  .attr("transform","translate("+(margin+width/2-80)+","+(margin+height-50)+")")
+  .append('text')
+  .attr("dy", ".35em")
+  .style("font-size", "18px")
+  .style("fill", "blue")
+  .style("stroke", "grey")
+  .style("stroke-width", "2px")
+  .style("paint-order", "stroke")
+  .text("Click on the buttons at the bottom to change scenes");
 
 }
 
